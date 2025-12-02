@@ -4,12 +4,14 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 
 from FSM import FormTrain, FormFilm
+from middleware import UserMiddleware
 from utils.train import Train
 from utils.movie import Movie
 from services.database import add_train, get_or_create_exercise,add_set,save_movie
 
 
 router = Router()
+router.message.middleware(UserMiddleware())
 
 
 @router.message(CommandStart())
