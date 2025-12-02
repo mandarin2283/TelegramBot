@@ -34,6 +34,14 @@ async def db_start():
         )
     """)
 
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS movies (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        grade FLOAT
+        )
+    """)
+
     db.commit()
 
 
@@ -62,4 +70,11 @@ async def add_set(workout_id, exercise_name, set_index, weight, reps):
     """, (workout_id, exercise_id, set_index, weight, reps))
     db.commit()
     print('Подход добавлен')
+
+
+async def save_movie(imdb_data,grade):
+    print(imdb_data)
+    title = imdb_data['Title']
+    cur.execute("INSERT INTO movies (title,grade) VALUES (?,?)", (title,grade))
+    db.commit()
 

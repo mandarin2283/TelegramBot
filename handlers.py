@@ -3,9 +3,10 @@ from aiogram.filters import CommandStart,Command
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 
-from FMS import FormTrain
+from FSM import FormTrain, FormFilm
 from utils.train import Train
-from services.database import add_train, get_or_create_exercise,add_set
+from utils.movie import Movie
+from services.database import add_train, get_or_create_exercise,add_set,save_movie
 
 
 router = Router()
@@ -20,6 +21,12 @@ async def start_handler(message: Message):
 async def train_handler(message: Message,state: FSMContext):
     await message.answer(f'Жду тренировку')
     await state.set_state(FormTrain.get_train)
+
+
+@router.message(Command('film'))
+async def film_handler(message: Message,state: FSMContext):
+    await message.answer('Жду фильм (название, оценка)')
+    await state.set_state(FormFilm.get_film)
 
 
 @router.message(FormTrain.get_train)
@@ -49,14 +56,14 @@ async def save_train(message: Message,state: FSMContext):
     data = await state.get_data()
     date, train_type, approaches = data['date'],data['train_type'],data['approaches']
     workout_id = await add_train(date, train_type)
-    for exersice in approaches.keys():
+    for exercise in approaches.keys():
         set_index = 1
-        weight, reps = approaches[exersice]
+        weight, reps = approaches[exercise]
         if not isinstance(reps, list):
             reps = [reps]
         for rep in reps:
             await add_set(workout_id,
-                          exersice,
+                          exercise,
                           set_index,
                           weight,
                           rep)
@@ -65,6 +72,13 @@ async def save_train(message: Message,state: FSMContext):
     await state.clear()
 
 
-@router.message()
-async def echo_handler(message: Message):
-    await message.send_copy(message.chat.id)
+@router.message(FormFilm.get_film)
+async def check_film(message: Message,state: FSMContext):
+    title,grade = message.text.split(',')
+    movie = Movie(title,grade)
+    imdb_data = movie.find_movie()
+    if imdb_data:
+        await save_movie(imdb_data,grade)
+        await message.answer('Фильм сохранен')
+    else:
+        await message.answer('Фильм не найден')
