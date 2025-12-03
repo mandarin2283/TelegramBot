@@ -9,7 +9,7 @@ from aiogram.types import Message, Update
 
 class UserMiddleware(BaseMiddleware):
 
-    OWNER_ID = int(os.getenv('OWNER_ID'))
+    OWNER_ID = int(os.environ.get('OWNER_ID'))
 
     async def __call__(
             self,
