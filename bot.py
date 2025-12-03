@@ -14,7 +14,7 @@ from services import database as db
 
 
 load_dotenv()
-TOKEN = os.getenv('TOKEN')
+TOKEN = os.environ.get('TOKEN')
 
 
 async def on_startup():

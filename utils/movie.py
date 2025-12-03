@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-OMDb_API = os.getenv('OMDb_API_KEY')
+OMDb_API = os.environ.get('OMDb_API')
 
 
 class Movie:
